@@ -6,7 +6,7 @@
 #define DEPTHSNAPSHOT_H
 #include <cstdint>
 
-#include "../InputOrderMessage.h"
+#include "InputOrderMessage.h"
 #include "OrderList.h"
 
 struct DepthLevel {
@@ -16,15 +16,14 @@ struct DepthLevel {
 
 class DepthSnapshot {
 public:
-    explicit DepthSnapshot(int depthLevels);
+    explicit DepthSnapshot(std::string symbol, const int& depthLevels);
 
-    void publishSnapshot();
+    void addNewOrder(const InputOrderMessage &newOrder, const uint32_t& sequenceNumber);
 
-    void addNewOrder(const InputOrderMessage & newOrder);
+    void publishSnapshot(const uint32_t& sequenceNumber);
 
-    // std::vector<DepthLevel> bids;
-    // std::vector<DepthLevel> asks;
-    //
+
+
     // bool operator==(const DepthSnapshot &other) const;
     //
     // bool operator!=(const DepthSnapshot &other) const
@@ -61,10 +60,10 @@ public:
     // std::map<int64_t, uint64_t> selectOrderBookSide(const OrderSide &orderSide);
 
 private:
-    int m_depthLevels;
-
-    OrderList m_bids;
-    OrderList m_asks;
+    int         m_depthLevels;
+    OrderList   m_bids;
+    OrderList   m_asks;
+    std::string m_symbol;
 };
 
 #endif //DEPTHSNAPSHOT_H

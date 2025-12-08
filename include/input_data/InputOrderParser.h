@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <iosfwd>
 
-#include "../InputOrderMessage.h"
+#include "../model/InputOrderMessage.h"
 
 class InputOrderParser {
 public:

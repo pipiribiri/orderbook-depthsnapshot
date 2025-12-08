@@ -4,11 +4,12 @@
 
 #ifndef DEPTHSNAPSHOTGENERATOR_H
 #define DEPTHSNAPSHOTGENERATOR_H
-#include <cstdint>
 
-#include "model/DepthSnapshot.h"
-#include "InputOrderMessage.h"
+#include <memory>
+#include <unordered_map>
+
 #include "input_data/OrderFileReader.h"
+#include "model/DepthSnapshot.h"
 
 
 class DepthSnapshotGenerator {
@@ -19,7 +20,8 @@ public:
 
 private:
     OrderFileReader m_orderFileReader;
-    DepthSnapshot   m_depthSnapshot;
+    int             m_depthLevel;
+    std::unordered_map<std::string, std::unique_ptr<DepthSnapshot>> m_snapshots;
 };
 
 #endif //DEPTHSNAPSHOTGENERATOR_H

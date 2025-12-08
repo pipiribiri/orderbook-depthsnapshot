@@ -11,4 +11,5 @@ bool OrderList::addNewOrder(const InputOrderMessage &newOrder, const int& depthL
     std::cout << "Adding new order to list with ID" << newOrder.orderId << std::endl;
 
     // m_orders.
+    return true;
 }

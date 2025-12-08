@@ -2,14 +2,18 @@
 // Created by marco on 05/12/2025.
 //
 #include <iostream>
+#include <utility>
 
 #include "../../include/model/DepthSnapshot.h"
 
-DepthSnapshot::DepthSnapshot(const int depthLevels)
-: m_depthLevels(depthLevels)
+#include <sstream>
+
+DepthSnapshot::DepthSnapshot(std::string symbol, const int& depthLevels)
+: m_depthLevels(depthLevels),
+  m_symbol(std::move(symbol))
 {}
 
-void DepthSnapshot::addNewOrder(const InputOrderMessage &newOrder)
+void DepthSnapshot::addNewOrder(const InputOrderMessage &newOrder, const uint32_t& sequenceNumber)
 {
     bool shouldProduceNewSnapshot = false;
 
@@ -30,14 +34,14 @@ void DepthSnapshot::addNewOrder(const InputOrderMessage &newOrder)
     // Then produce a new snapshot if applicable
     if (shouldProduceNewSnapshot)
     {
-        publishSnapshot();
+        publishSnapshot(sequenceNumber);
     }
 }
 
-void DepthSnapshot::publishSnapshot()
+void DepthSnapshot::publishSnapshot(const uint32_t& sequenceNumber)
 {
     // DepthSnapshot snap;
-    // int count = 0;
+    int count = 0;
     // for (auto &[price, vol]: m_bids) {
     //     if (count >= m_depthLevels) break;
     //     snap.bids.push_back({price, vol});
@@ -54,6 +58,20 @@ void DepthSnapshot::publishSnapshot()
     //     std::cout << snap.toString(sequenceNo, m_symbol) << "\n";
     //     m_lastSnapshot = snap;
     // }
+
+    // std::ostringstream oss;
+    // oss << m_sequenceNumber << ", " << m_symbol << ", [";
+    // for (size_t i = 0; i < m_bids.size(); ++i) {
+    //     if (i > 0) oss << ", ";
+    //     oss << "(" << m_bids[i].price << ", " << m_bids[i].volume << ")";
+    // }
+    // oss << "], [";
+    // for (size_t i = 0; i < asks.size(); ++i) {
+    //     if (i > 0) oss << ", ";
+    //     oss << "(" << m_asks[i].price << ", " << m_asks[i].volume << ")";
+    // }
+    // oss << "]";
+    // return oss.str();
 }
 
 // #include <sstream>

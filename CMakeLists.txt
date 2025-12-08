@@ -6,12 +6,11 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(OrderBookFeed src/main.cpp
         src/DepthSnapshotGenerator.cpp
         include/DepthSnapshotGenerator.h
-        include/InputOrderMessage.h
+        include/model/InputOrderMessage.h
         include/model/DepthSnapshot.h
         src/model/DepthSnapshot.cpp
         src/model/OrderList.cpp
         include/model/OrderList.h
-        include/Order.h
         src/input_data/InputOrderParser.cpp
         include/input_data/InputOrderParser.h
         tests/TestDepthSnapshot.cpp

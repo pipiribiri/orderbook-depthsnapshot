@@ -7,7 +7,7 @@
 #include <fstream>
 #include <cstdint>
 
-#include "../InputOrderMessage.h"
+#include "../model/InputOrderMessage.h"
 
 struct InputOrderMessage;
 
@@ -17,11 +17,10 @@ public:
 
     void start() const;
 
-    bool next(InputOrderMessage& retOrder);
+    bool next(InputOrderMessage &retOrder, uint32_t& retSequenceNumber);
 
 private:
     std::ifstream m_inputFile;
-    uint32_t m_sequenceNo;
 };
 
 #endif //ORDERFILEREADER_H

@@ -16,11 +16,11 @@ void OrderFileReader::start() const
     }
 }
 
-bool OrderFileReader::next(InputOrderMessage &retOrder)
+bool OrderFileReader::next(InputOrderMessage &retOrder, uint32_t& retSequenceNumber)
 {
     if (!m_inputFile.good()) return false;
 
-    m_sequenceNo = InputOrderParser::readSequenceNo(m_inputFile);
+    retSequenceNumber = InputOrderParser::readSequenceNo(m_inputFile);
     const uint32_t messageSize = InputOrderParser::readMessageSize(m_inputFile);
     (void)messageSize; // not used directly, but could validate
 

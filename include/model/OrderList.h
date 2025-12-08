@@ -4,8 +4,7 @@
 
 #ifndef ORDERLIST_H
 #define ORDERLIST_H
-#include "../InputOrderMessage.h"
-
+#include "InputOrderMessage.h"
 
 class OrderList {
 public:
