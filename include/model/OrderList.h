@@ -47,7 +47,7 @@ public:
 
            case OrderType::EXECUTE:
                price = executeOrder(newOrder.orderId, newOrder.tradedQuantity);
-               shouldUpdate = isPriceInTopLevel(price);
+               shouldUpdate = levelsChanged() || isPriceInTopLevel(price);
                break;
        }
        return shouldUpdate;
@@ -74,7 +74,7 @@ private:
 
     static constexpr int64_t invalidPrice() { return std::numeric_limits<int64_t>::min(); }
 
-    void addOrder(uint64_t orderId, int64_t price, uint64_t volume)
+    void addOrder(const uint64_t orderId, int64_t price, uint64_t volume)
     {
         m_orders[orderId] = {price, volume};
         auto [it, inserted] = m_book.emplace(price, 0);
@@ -82,63 +82,81 @@ private:
         it->second += volume;
     }
 
-    int64_t updateOrder(uint64_t orderId, int64_t newPrice, uint64_t newSize)
+    int64_t updateOrder(const uint64_t orderId, int64_t newPrice, uint64_t newSize)
     {
-        const auto oit = m_orders.find(orderId);
-        if (oit == m_orders.end()) return invalidPrice();
-        int64_t oldPrice = oit->second.price;
-        uint64_t oldSize = oit->second.size;
+        int64_t price = invalidPrice();
+        if (const auto orderIt = m_orders.find(orderId); orderIt != m_orders.end())
+        {
+            uint64_t oldSize = orderIt->second.size;
 
-        auto bit = m_book.find(oldPrice);
-        if (bit != m_book.end()) {
-            if (bit->second <= oldSize) { m_book.erase(bit); m_levelCount--; }
-            else bit->second -= oldSize;
+            if (auto bookIt = m_book.find(orderIt->second.price); bookIt != m_book.end()) {
+                if (bookIt->second <= oldSize)
+                {
+                    m_book.erase(bookIt);
+                    m_levelCount--;
+                }
+                else bookIt->second -= oldSize;
+            }
+            orderIt->second.price = newPrice;
+            orderIt->second.size  = newSize;
+
+            auto [newOrderIt, inserted] = m_book.emplace(newPrice, 0);
+            if (inserted)
+            {
+                m_levelCount++;
+            }
+            newOrderIt->second += newSize;
+
+            price = newPrice;
         }
-
-        oit->second.price = newPrice;
-        oit->second.size  = newSize;
-
-        auto [nit, inserted] = m_book.emplace(newPrice, 0);
-        if (inserted) m_levelCount++;
-        nit->second += newSize;
-
-        return newPrice;
+        return price;
     }
 
-    int64_t executeOrder(uint64_t orderId, uint64_t tradedQuantity)
+    int64_t executeOrder(const uint64_t orderId, uint64_t tradedQuantity)
     {
-        const auto oit = m_orders.find(orderId);
-        if (oit == m_orders.end()) return invalidPrice();
-        int64_t price = oit->second.price;
+        int64_t price = invalidPrice();
 
-        auto bit = m_book.find(price);
-        if (bit == m_book.end()) return invalidPrice();
+        if (const auto orderIt = m_orders.find(orderId); orderIt != m_orders.end())
+        {
+            if (auto bookIt = m_book.find(orderIt->second.price); bookIt != m_book.end())
+            {
+                price = orderIt->second.price;
 
-        if (tradedQuantity >= oit->second.size) {
-            tradedQuantity = oit->second.size;
-            m_orders.erase(oit);
-            if (bit->second <= tradedQuantity) { m_book.erase(bit); m_levelCount--; }
-            else bit->second -= tradedQuantity;
-        } else {
-            oit->second.size -= tradedQuantity;
-            bit->second -= tradedQuantity;
+                if (tradedQuantity >= orderIt->second.size) {
+                    tradedQuantity = orderIt->second.size;
+                    m_orders.erase(orderIt);
+                    if (bookIt->second <= tradedQuantity)
+                    {
+                        m_book.erase(bookIt);
+                        m_levelCount--;
+                    }
+                    else bookIt->second -= tradedQuantity;
+                } else {
+                    orderIt->second.size -= tradedQuantity;
+                    bookIt->second -= tradedQuantity;
+                }
+            }
         }
         return price;
     }
 
     int64_t removeOrder(const uint64_t orderId)
     {
-        const auto oit = m_orders.find(orderId);
-        if (oit == m_orders.end()) return invalidPrice();
-        int64_t price = oit->second.price;
-        uint64_t size = oit->second.size;
-        m_orders.erase(oit);
+        int64_t price = invalidPrice();
 
-        auto bit = m_book.find(price);
-        if (bit != m_book.end()) {
-            if (bit->second <= size) { m_book.erase(bit); m_levelCount--; }
-            else bit->second -= size;
+        // First remove it from the orders
+        if (const auto orderIt = m_orders.find(orderId); orderIt != m_orders.end())
+        {
+            price = orderIt->second.price;
+
+            // Then remove it from the book
+            if (auto bookIt = m_book.find(price); bookIt != m_book.end()) {
+                // Delete it completely or partially
+                if (bookIt->second <= orderIt->second.size) { m_book.erase(bookIt); m_levelCount--; }
+                else bookIt->second -= orderIt->second.size;
+            }
         }
+
         return price;
     }
 
@@ -153,18 +171,23 @@ private:
 
     int64_t getOrderPrice(const uint64_t orderId) const
     {
-        const auto it = m_orders.find(orderId);
-        return it == m_orders.end() ? invalidPrice() : it->second.price;
+        int64_t ret = invalidPrice();
+
+        if (const auto it = m_orders.find(orderId); it != m_orders.end())
+        {
+            ret = it->second.price;
+        }
+
+        return ret;
     }
 
     bool levelsChanged()
     {
-        bool changed = false;
+        const bool changed = m_levelCount != m_lastLevelCount;
 
-        if (m_levelCount != m_lastLevelCount)
+        if (changed)
         {
             m_lastLevelCount = m_levelCount;
-            changed = true;
         }
         return changed;
     }

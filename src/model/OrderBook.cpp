@@ -17,7 +17,6 @@ void OrderBook::receiveNewOrder(const InputOrderMessage &newOrder, const uint32_
 {
     bool shouldProduceNewSnapshot = false;
 
-    // First, add the order to the corresponding list
     if (newOrder.side == OrderSide::BUY)
     {
         shouldProduceNewSnapshot = m_bids.receiveNewOrder(newOrder);

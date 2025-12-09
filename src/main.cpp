@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 
      depthSnapshotGenerator.start();
 
-     std::cout << "Depth Snapshot generator started." << std::endl;
+     std::cout << "Depth Snapshot generator finished." << std::endl;
 
      return 0;
 }
