@@ -105,13 +105,10 @@ private:
             orderIt->second.price = newPrice;
             orderIt->second.size  = newSize;
 
-            auto [newOrderIt, inserted] = m_book.emplace(newPrice, 0);
-            if (inserted)
+            if (auto [newOrderIt, inserted] = m_book.emplace(newPrice, newSize); inserted)
             {
                 recalculateLevelCount();
             }
-            newOrderIt->second += newSize;
-
             price = newPrice;
         }
         return price;

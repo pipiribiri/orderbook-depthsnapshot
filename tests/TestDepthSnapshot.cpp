@@ -137,24 +137,32 @@ void testCancelOrder_NoSnapshotNeeded()
 
 void testExample1()
 {
-    OrderBook book("VC0", 3);
+    OrderBook book("VC0", 5);
 
-    std::string expected = "3, VC0, [], []\n";
-    InputOrderMessage addAsk1{OrderType::ADD, "VC0", 1, OrderSide::SELL, 390000, 100, 0};
-    InputOrderMessage addAsk2{OrderType::ADD, "VC0", 2, OrderSide::SELL, 380000, 100, 0};
-    InputOrderMessage addAsk3{OrderType::ADD, "VC0", 3, OrderSide::SELL, 370000, 100, 0};
-    InputOrderMessage addAsk4{OrderType::ADD, "VC0", 4, OrderSide::SELL, 360000, 100, 0};
-    InputOrderMessage addAsk5{OrderType::ADD, "VC0", 5, OrderSide::SELL, 350000, 100, 0};
+    std::string expected = "1, VC0, [(318800, 5000)], []\n2, VC0, [(318800, 5000), (315000, 2986)], []\n3, VC0, [(318800, 4709), (315000, 2986)], []\n4, VC0, [(318800, 4709), (315000, 2986)], [(318900, 360)]\n5, VC0, [(318800, 4709), (315000, 2986)], [(318900, 159)]\n6, VC0, [(318800, 4709), (315000, 2986)], []\n7, VC0, [(319000, 888), (318800, 4709)], []\n8, VC0, [(319000, 221), (318800, 4709)], []\n9, VC0, [(318800, 4709)], []\n";
+    InputOrderMessage order1{OrderType::ADD, "VC0", 6990022307456631368, OrderSide::BUY, 318800, 5000, 0};
+    InputOrderMessage order2{OrderType::ADD, "VC0", 6990022307456647284, OrderSide::BUY, 315000, 2986, 0};
+    InputOrderMessage order3{OrderType::EXECUTE, "VC0", 6990022307456631368, OrderSide::BUY, 0, 0, 291};
+    InputOrderMessage order4{OrderType::ADD, "VC0", 6990022307456649231, OrderSide::SELL, 318900, 360, 0};
+    InputOrderMessage order5{OrderType::EXECUTE, "VC0", 6990022307456649231, OrderSide::SELL, 0, 0, 201};
+    InputOrderMessage order6{OrderType::EXECUTE, "VC0", 6990022307456649231, OrderSide::SELL, 0, 0, 159};
+    InputOrderMessage order7{OrderType::UPDATE, "VC0", 6990022307456647284, OrderSide::BUY, 319000, 888, 0};
+    InputOrderMessage order8{OrderType::EXECUTE, "VC0", 6990022307456647284, OrderSide::BUY, 0, 0, 667};
+    InputOrderMessage order9{OrderType::EXECUTE, "VC0", 6990022307456647284, OrderSide::BUY, 0, 0, 221};
 
     // Start capturing cout
     std::stringstream buffer;
     std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
 
-    book.receiveNewOrder(addAsk1, 10);
-    book.receiveNewOrder(addAsk2, 11);
-    book.receiveNewOrder(addAsk3, 12);
-    book.receiveNewOrder(addAsk4, 13);
-    book.receiveNewOrder(addAsk5, 14);
+    book.receiveNewOrder(order1, 1);
+    book.receiveNewOrder(order2, 2);
+    book.receiveNewOrder(order3, 3);
+    book.receiveNewOrder(order4, 4);
+    book.receiveNewOrder(order5, 5);
+    book.receiveNewOrder(order6, 6);
+    book.receiveNewOrder(order7, 7);
+    book.receiveNewOrder(order8, 8);
+    book.receiveNewOrder(order9, 9);
 
     std::cout.rdbuf(oldCout);
     std::string output = buffer.str();
@@ -169,7 +177,7 @@ int main() {
     testExecuteOrder();
     testAddOrder_NoSnapshotNeeded();
     testCancelOrder_NoSnapshotNeeded();
-    // testExample1();
+    testExample1();
 
     std::cout << "✅ All 'no snapshot needed' tests passed!" << std::endl;
     return 0;
