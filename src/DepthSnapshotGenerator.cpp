@@ -17,7 +17,7 @@ void DepthSnapshotGenerator::start()
 
     try
     {
-        std::cout << "Starting to process order messages" << std::endl;
+        // std::cout << "Starting to process order messages" << std::endl;
 
         InputOrderMessage newOrder;
         uint32_t sequenceNumber;
@@ -25,7 +25,7 @@ void DepthSnapshotGenerator::start()
         {
             if (m_orderBooks.find(newOrder.symbol) == std::end(m_orderBooks))
             {
-                std::cout << "Creating snapshot data for symbol: " << newOrder.symbol << std::endl;
+                // std::cout << "Creating snapshot data for symbol: " << newOrder.symbol << std::endl;
                 m_orderBooks.emplace(newOrder.symbol, std::make_unique<OrderBook>(OrderBook(newOrder.symbol, m_depthLevels)));
             }
             m_orderBooks[newOrder.symbol]->receiveNewOrder(newOrder, sequenceNumber);

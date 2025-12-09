@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
      const int depthLevels = std::stoi(argv[1]);
      const std::string inputFilename = argv[2];
 
-     std::cout << "Starting Depth Snapshot generator for input file " << inputFilename << " with " << depthLevels << " levels of depth." << std::endl;
+     // std::cout << "Starting Depth Snapshot generator for input file " << inputFilename << " with " << depthLevels << " levels of depth." << std::endl;
 
      DepthSnapshotGenerator depthSnapshotGenerator(
           depthLevels,
@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 
      depthSnapshotGenerator.start();
 
-     std::cout << "Depth Snapshot generator finished." << std::endl;
+     // std::cout << "Depth Snapshot generator finished." << std::endl;
 
      return 0;
 }
