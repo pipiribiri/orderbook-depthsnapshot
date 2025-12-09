@@ -9,7 +9,7 @@
 #include <unordered_map>
 
 #include "input_data/OrderFileReader.h"
-#include "model/DepthSnapshot.h"
+#include "model/OrderBook.h"
 
 
 class DepthSnapshotGenerator {
@@ -20,8 +20,8 @@ public:
 
 private:
     OrderFileReader m_orderFileReader;
-    int             m_depthLevel;
-    std::unordered_map<std::string, std::unique_ptr<DepthSnapshot>> m_snapshots;
+    int             m_depthLevels;
+    std::unordered_map<std::string, std::unique_ptr<OrderBook>> m_orderBooks;
 };
 
 #endif //DEPTHSNAPSHOTGENERATOR_H

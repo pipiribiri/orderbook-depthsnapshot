@@ -6,9 +6,9 @@
 
 #include <iostream>
 
-DepthSnapshotGenerator::DepthSnapshotGenerator(int depthLevels, OrderFileReader orderFileReader)
+DepthSnapshotGenerator::DepthSnapshotGenerator(int m_depthLevels, OrderFileReader orderFileReader)
 : m_orderFileReader(std::move(orderFileReader)),
-  m_depthLevel(depthLevels)
+  m_depthLevels(m_depthLevels)
 {}
 
 void DepthSnapshotGenerator::start()
@@ -23,12 +23,12 @@ void DepthSnapshotGenerator::start()
         uint32_t sequenceNumber;
         while (m_orderFileReader.next(newOrder, sequenceNumber))
         {
-            if (m_snapshots.find(newOrder.symbol) == std::end(m_snapshots))
+            if (m_orderBooks.find(newOrder.symbol) == std::end(m_orderBooks))
             {
                 std::cout << "Creating snapshot data for symbol: " << newOrder.symbol << std::endl;
-                m_snapshots.emplace(newOrder.symbol, std::make_unique<DepthSnapshot>(DepthSnapshot(newOrder.symbol, m_depthLevel)));
+                m_orderBooks.emplace(newOrder.symbol, std::make_unique<OrderBook>(OrderBook(newOrder.symbol, m_depthLevels)));
             }
-            m_snapshots[newOrder.symbol]->addNewOrder(newOrder, sequenceNumber);
+            m_orderBooks[newOrder.symbol]->receiveNewOrder(newOrder, sequenceNumber);
         }
     }
     catch (const std::exception& ex)
