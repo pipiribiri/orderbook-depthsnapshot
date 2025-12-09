@@ -78,8 +78,12 @@ private:
     {
         m_orders[orderId] = {price, volume};
         auto [it, inserted] = m_book.emplace(price, 0);
-        if (inserted) m_levelCount++;
         it->second += volume;
+
+        if (inserted)
+        {
+            recalculateLevelCount();
+        }
     }
 
     int64_t updateOrder(const uint64_t orderId, int64_t newPrice, uint64_t newSize)
@@ -89,11 +93,12 @@ private:
         {
             uint64_t oldSize = orderIt->second.size;
 
-            if (auto bookIt = m_book.find(orderIt->second.price); bookIt != m_book.end()) {
+            if (auto bookIt = m_book.find(orderIt->second.price); bookIt != m_book.end())
+            {
                 if (bookIt->second <= oldSize)
                 {
                     m_book.erase(bookIt);
-                    m_levelCount--;
+                    recalculateLevelCount();
                 }
                 else bookIt->second -= oldSize;
             }
@@ -103,7 +108,7 @@ private:
             auto [newOrderIt, inserted] = m_book.emplace(newPrice, 0);
             if (inserted)
             {
-                m_levelCount++;
+                recalculateLevelCount();
             }
             newOrderIt->second += newSize;
 
@@ -128,10 +133,15 @@ private:
                     if (bookIt->second <= tradedQuantity)
                     {
                         m_book.erase(bookIt);
-                        m_levelCount--;
+                        recalculateLevelCount();
                     }
-                    else bookIt->second -= tradedQuantity;
-                } else {
+                    else
+                    {
+                        bookIt->second -= tradedQuantity;
+                    }
+                }
+                else
+                {
                     orderIt->second.size -= tradedQuantity;
                     bookIt->second -= tradedQuantity;
                 }
@@ -150,9 +160,14 @@ private:
             price = orderIt->second.price;
 
             // Then remove it from the book
-            if (auto bookIt = m_book.find(price); bookIt != m_book.end()) {
+            if (auto bookIt = m_book.find(price); bookIt != m_book.end())
+            {
                 // Delete it completely or partially
-                if (bookIt->second <= orderIt->second.size) { m_book.erase(bookIt); m_levelCount--; }
+                if (bookIt->second <= orderIt->second.size)
+                {
+                    m_book.erase(bookIt);
+                    recalculateLevelCount();
+                }
                 else bookIt->second -= orderIt->second.size;
             }
         }
@@ -163,7 +178,8 @@ private:
     bool isPriceInTopLevel(int64_t price) const
     {
         int count = 0;
-        for (auto it = m_book.begin(); it != m_book.end() && count < m_depthLevels; ++it, ++count) {
+        for (auto it = m_book.begin(); it != m_book.end() && count < m_depthLevels; ++it, ++count)
+        {
             if (it->first == price) return true;
         }
         return false;
@@ -179,6 +195,21 @@ private:
         }
 
         return ret;
+    }
+
+    void recalculateLevelCount()
+    {
+        // Recalculate level count for the depth level
+        m_levelCount = 0;
+        int count = 0;
+
+        for (auto it2 = m_book.begin(); it2 != m_book.end() && count < m_depthLevels; ++it2, ++count)
+        {
+            if (it2->second > 0)
+            {
+                m_levelCount++;
+            }
+        }
     }
 
     bool levelsChanged()
