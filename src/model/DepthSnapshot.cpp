@@ -2,7 +2,7 @@
 // Created by marco on 08/12/2025.
 //
 
-#include "../../include/model/DepthSnapshot.h"
+#include "model/DepthSnapshot.h"
 
 #include <iostream>
 #include <sstream>

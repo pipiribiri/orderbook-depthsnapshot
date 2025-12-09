@@ -7,7 +7,7 @@
 #include <fstream>
 #include <cstdint>
 
-#include "../model/InputOrderMessage.h"
+#include "model/InputOrderMessage.h"
 
 struct InputOrderMessage;
 

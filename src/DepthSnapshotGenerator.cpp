@@ -2,7 +2,7 @@
 // Created by marco on 05/12/2025.
 //
 
-#include "../include/DepthSnapshotGenerator.h"
+#include "DepthSnapshotGenerator.h"
 
 #include <iostream>
 

@@ -5,7 +5,7 @@
 #include <sstream>
 #include <utility>
 
-#include "../../include/model/OrderBook.h"
+#include "model/OrderBook.h"
 
 OrderBook::OrderBook(std::string symbol, const int depthLevels)
 : m_symbol(std::move(symbol)),

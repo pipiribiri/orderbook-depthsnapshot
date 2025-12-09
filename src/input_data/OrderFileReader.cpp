@@ -2,8 +2,8 @@
 // Created by marco on 08/12/2025.
 //
 
-#include "../../include/input_data/OrderFileReader.h"
-#include "../../include/input_data/InputOrderParser.h"
+#include "input_data/OrderFileReader.h"
+#include "input_data/InputOrderParser.h"
 OrderFileReader::OrderFileReader(const std::string &filename)
 : m_inputFile(filename, std::ios::binary)
 {}

@@ -1,8 +1,8 @@
 #include <cstdint>
 #include <iostream>
 
-#include "../include/DepthSnapshotGenerator.h"
-#include "../include/input_data/OrderFileReader.h"
+#include "DepthSnapshotGenerator.h"
+#include "input_data/OrderFileReader.h"
 
 int main(int argc, char* argv[])
 {
