@@ -35,10 +35,12 @@ bool OrderFileReader::next(InputOrderMessage &retOrder, uint32_t& retSequenceNum
             retOrder.price = 0;
             retOrder.tradedQuantity = 0;
 
+            // Read quantity for EXECUTE orders
             if (retOrder.type == OrderType::EXECUTE)
             {
                 retOrder.tradedQuantity = InputOrderParser::readTradedQuantity(m_inputFile);
             }
+            // Read volume & price for ADD & UPDATE orders
             else if (retOrder.type == OrderType::ADD || retOrder.type == OrderType::UPDATE)
             {
                 retOrder.volume  = InputOrderParser::readVolume(m_inputFile);

@@ -11,7 +11,7 @@
 
 class InputOrderParser {
 public:
-    // Reader functions for each field
+    // Reader functions for each field in an order
     static std::uint32_t readSequenceNo(std::istream& in);
     static uint32_t readMessageSize(std::istream& in);
     static OrderType  readOrderType(std::istream& in);
