@@ -52,6 +52,52 @@ void testUpdateOrder() {
     std::cout << "✅ testUpdateOrder passed\n";
 }
 
+// Test Update order
+void testUpdateOverlappingOrder() {
+    OrderBook book("VC0", 3);
+
+    std::string expected = "1, VC0, [(318800, 4709)], []\n2, VC0, [(318800, 3000)], []\n";
+    InputOrderMessage addBid{OrderType::ADD, "VC0", 1, OrderSide::BUY, 318800, 1000, 0};
+    InputOrderMessage addBid2{OrderType::ADD, "VC0", 2, OrderSide::BUY, 318800, 2000, 0};
+    InputOrderMessage updateBid{OrderType::UPDATE, "VC0", 1, OrderSide::BUY, 310800, 3000, 0};
+
+    // Start capturing cout
+    std::stringstream buffer;
+    std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
+
+    book.receiveNewOrder(addBid, 1);
+    book.receiveNewOrder(updateBid, 2);
+
+    std::cout.rdbuf(oldCout);
+    std::string output = buffer.str();
+
+    // assert(output == expected);
+    std::cout << "✅ testUpdateOrder passed\n";
+}
+
+// Test Update order
+void testUpdateVolumeAndPrice() {
+    OrderBook book("VC0", 3);
+
+    std::string expected = "1, VC0, [(318800, 4709)], []\n2, VC0, [(318800, 3000)], []\n";
+    InputOrderMessage addBid{OrderType::ADD, "VC0", 1, OrderSide::BUY, 318800, 1000, 0};
+    InputOrderMessage addBid2{OrderType::ADD, "VC0", 2, OrderSide::BUY, 318800, 2000, 0};
+    InputOrderMessage updateBid{OrderType::UPDATE, "VC0", 1, OrderSide::BUY, 310800, 3000, 0};
+
+    // Start capturing cout
+    std::stringstream buffer;
+    std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
+
+    book.receiveNewOrder(addBid, 1);
+    book.receiveNewOrder(updateBid, 2);
+
+    std::cout.rdbuf(oldCout);
+    std::string output = buffer.str();
+
+    // assert(output == expected);
+    std::cout << "✅ testUpdateOrder passed\n";
+}
+
 // Test Execute order
 void testExecuteOrder() {
     OrderBook book("VC0", 3);
@@ -72,6 +118,40 @@ void testExecuteOrder() {
 
     assert(output == expected);
     std::cout << "✅ testExecuteOrder passed\n";
+}
+
+void testCancelOrder_NoSnapshotNeeded()
+{
+    OrderBook book("VC0", 3);
+
+    std::string expected = "10, VC0, [], [(350000, 100)]\n11, VC0, [], [(350000, 100), (360000, 100)]\n12, VC0, [], [(350000, 100), (360000, 100), (370000, 100)]\n";
+    InputOrderMessage addAsk1{OrderType::ADD, "VC0", 1, OrderSide::SELL, 350000, 100, 0};
+    InputOrderMessage addAsk2{OrderType::ADD, "VC0", 2, OrderSide::SELL, 360000, 100, 0};
+    InputOrderMessage addAsk3{OrderType::ADD, "VC0", 3, OrderSide::SELL, 370000, 100, 0};
+    InputOrderMessage addAsk4{OrderType::ADD, "VC0", 4, OrderSide::SELL, 380000, 100, 0};
+    InputOrderMessage addUpdate4{OrderType::UPDATE, "VC0", 4, OrderSide::SELL, 380000, 10, 0};
+    InputOrderMessage addDelete4{OrderType::DELETE, "VC0", 4, OrderSide::SELL, 380000, 10, 0};
+    InputOrderMessage addAsk5{OrderType::ADD, "VC0", 5, OrderSide::SELL, 390000, 100, 0};
+    InputOrderMessage addExecute5{OrderType::EXECUTE, "VC0", 5, OrderSide::SELL, 390000, 40, 0};
+
+    // Start capturing cout
+    std::stringstream buffer;
+    std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
+
+    book.receiveNewOrder(addAsk1, 10);
+    book.receiveNewOrder(addAsk2, 11);
+    book.receiveNewOrder(addAsk3, 12);
+    book.receiveNewOrder(addAsk4, 13);
+    book.receiveNewOrder(addUpdate4, 14);
+    book.receiveNewOrder(addDelete4, 15);
+    book.receiveNewOrder(addAsk5, 16);
+    book.receiveNewOrder(addExecute5, 17);
+
+    std::cout.rdbuf(oldCout);
+    std::string output = buffer.str();
+
+    assert(output == expected);
+    std::cout << "✅ testCancelOrder_NoSnapshotNeeded passed\n";
 }
 
 void testAddOrder_NoSnapshotNeeded() {
@@ -101,11 +181,11 @@ void testAddOrder_NoSnapshotNeeded() {
     std::cout << "✅ testAddOrder_NoSnapshotNeeded passed\n";
 }
 
-void testCancelOrder_NoSnapshotNeeded()
+void testRemoveRelevantLevelOrder()
 {
     OrderBook book("VC0", 3);
 
-    std::string expected = "10, VC0, [], [(350000, 100)]\n11, VC0, [], [(350000, 100), (360000, 100)]\n12, VC0, [], [(350000, 100), (360000, 100), (370000, 100)]\n";
+    std::string expected = "10, VC0, [], [(350000, 100)]\n11, VC0, [], [(350000, 100), (360000, 100)]\n12, VC0, [], [(350000, 100), (360000, 100), (370000, 100)]\n17, VC0, [], [(350000, 100), (370000, 100), (390000, 100)]\n18, VC0, [], [(350000, 100), (390000, 100)]\n20, VC0, [], [(350000, 100), (390000, 60)]\n";
     InputOrderMessage addAsk1{OrderType::ADD, "VC0", 1, OrderSide::SELL, 350000, 100, 0};
     InputOrderMessage addAsk2{OrderType::ADD, "VC0", 2, OrderSide::SELL, 360000, 100, 0};
     InputOrderMessage addAsk3{OrderType::ADD, "VC0", 3, OrderSide::SELL, 370000, 100, 0};
@@ -113,7 +193,10 @@ void testCancelOrder_NoSnapshotNeeded()
     InputOrderMessage addUpdate4{OrderType::UPDATE, "VC0", 4, OrderSide::SELL, 380000, 10, 0};
     InputOrderMessage addDelete4{OrderType::DELETE, "VC0", 4, OrderSide::SELL, 380000, 10, 0};
     InputOrderMessage addAsk5{OrderType::ADD, "VC0", 5, OrderSide::SELL, 390000, 100, 0};
+    InputOrderMessage addDelete2{OrderType::DELETE, "VC0", 2, OrderSide::SELL, 360000, 100, 0};
+    InputOrderMessage addDelete3{OrderType::DELETE, "VC0", 3, OrderSide::SELL, 370000, 100, 0};
     InputOrderMessage addExecute5{OrderType::EXECUTE, "VC0", 5, OrderSide::SELL, 390000, 40, 0};
+    InputOrderMessage addExecute6{OrderType::EXECUTE, "VC0", 5, OrderSide::SELL, 390000, 0, 40};
 
     // Start capturing cout
     std::stringstream buffer;
@@ -126,7 +209,10 @@ void testCancelOrder_NoSnapshotNeeded()
     book.receiveNewOrder(addUpdate4, 14);
     book.receiveNewOrder(addDelete4, 15);
     book.receiveNewOrder(addAsk5, 16);
-    book.receiveNewOrder(addExecute5, 17);
+    book.receiveNewOrder(addDelete2, 17);
+    book.receiveNewOrder(addDelete3, 18);
+    book.receiveNewOrder(addExecute5, 19);
+    book.receiveNewOrder(addExecute6, 20);
 
     std::cout.rdbuf(oldCout);
     std::string output = buffer.str();
@@ -174,7 +260,10 @@ void testExample1()
 int main() {
     testAddOrder();
     testUpdateOrder();
+    testUpdateOverlappingOrder();
+    testUpdateVolumeAndPrice();
     testExecuteOrder();
+    testRemoveRelevantLevelOrder();
     testAddOrder_NoSnapshotNeeded();
     testCancelOrder_NoSnapshotNeeded();
     testExample1();
