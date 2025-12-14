@@ -24,29 +24,6 @@ A high-performance C++17 market data order book engine designed to process Add/U
 - OrderBook orchestrates message handling and snapshot publishing.
 - DepthSnapshot provides a clean, serializable representation of the book state.
 
-## Project Structure
-
-OrderBookDepthSnapshot/
-│
-├── include/
-│   ├── model/
-│   │   ├── OrderBook.h
-│   │   ├── OrderList.h
-│   │   ├── DepthSnapshot.h
-│   │   ├── Message.h
-│   │   └── ...
-│   └── ...
-│
-├── src/
-│   ├── model/
-│   │   ├── OrderBook.cpp
-│   │   ├── OrderList.cpp (if needed)
-│   │   └── ...
-│   └── main.cpp
-│
-├── CMakeLists.txt
-└── README.md
-
 ## Requirements
 - C++17
 - CMake ≥ 3.15
