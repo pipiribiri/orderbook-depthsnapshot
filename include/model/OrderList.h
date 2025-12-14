@@ -46,6 +46,7 @@ public:
            case OrderType::DELETE:
                price = removeOrder(newOrder.orderId);
                shouldUpdateSnapshot = levelCountChanged() || isPriceInDepthLevel(price);
+               break;
 
            case OrderType::EXECUTE:
                price = executeOrder(newOrder.orderId, newOrder.tradedQuantity);
