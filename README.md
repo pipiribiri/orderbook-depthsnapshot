@@ -81,4 +81,3 @@ You can feed synthetic or real market data messages into OrderBook::handleMessag
 - SIMD-accelerated snapshot building (via intrinsics or xsimd)
 - Replace std::map with flat_map for better cache locality
 - Add unit tests for edge cases (crossed book, empty book, large updates)
-- Add support for multiple symbols via unordered_map<string, OrderBook>
