@@ -77,20 +77,27 @@ private:
 
     static constexpr int64_t invalidPrice() { return std::numeric_limits<int64_t>::min(); }
 
-    bool addOrder(const uint64_t orderId, int64_t price, uint64_t volume)
+    bool addOrder(const uint64_t orderId, int64_t price, uint64_t size)
     {
-        bool shouldUpdateSnapshot = false;
+        m_orders[orderId] = {price, size};
 
-        m_orders[orderId] = {price, volume};
-        auto [it, inserted] = m_book.emplace(price, 0);
-        it->second += volume;
+        addOrderToBook(price, size);
 
-        if (inserted && isPriceInDepthLevel(price))
+        return isPriceInDepthLevel(price);
+    }
+
+   void addOrderToBook(int64_t newPrice, uint64_t newSize)
+    {
+        // Update the entry with the new price, either create one or update the volume of the existing one
+        if (auto it = m_book.find(newPrice); it == m_book.end())
         {
-            shouldUpdateSnapshot = true;
+            m_book[newPrice] = newSize;
         }
-
-        return shouldUpdateSnapshot;
+        else
+        {
+            // Existing price level → accumulate volume
+            it->second += newSize;
+        }
     }
 
     bool updateOrder(const uint64_t orderId, int64_t newPrice, uint64_t newSize)
@@ -119,10 +126,7 @@ private:
             orderIt->second.price = newPrice;
             orderIt->second.size  = newSize;
 
-            if (auto [newOrderIt, inserted] = m_book.emplace(newPrice, newSize); !inserted)
-            {
-                std::cout << "Error updating order with ID " << orderId << std::endl;
-            }
+            addOrderToBook(newPrice, newSize);
         }
         return shouldUpdateSnapshot;
     }

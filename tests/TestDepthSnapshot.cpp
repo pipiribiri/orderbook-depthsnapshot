@@ -56,30 +56,31 @@ void testUpdateOrder() {
 void testUpdateOverlappingOrder() {
     OrderBook book("VC0", 3);
 
-    std::string expected = "1, VC0, [(318800, 4709)], []\n2, VC0, [(318800, 3000)], []\n";
+    std::string expected = "1, VC0, [(318800, 1000)], []\n2, VC0, [(318800, 1000), (308800, 2000)], []\n3, VC0, [(308800, 5000)], []\n";
     InputOrderMessage addBid{OrderType::ADD, "VC0", 1, OrderSide::BUY, 318800, 1000, 0};
-    InputOrderMessage addBid2{OrderType::ADD, "VC0", 2, OrderSide::BUY, 318800, 2000, 0};
-    InputOrderMessage updateBid{OrderType::UPDATE, "VC0", 1, OrderSide::BUY, 310800, 3000, 0};
+    InputOrderMessage addBid2{OrderType::ADD, "VC0", 2, OrderSide::BUY, 308800, 2000, 0};
+    InputOrderMessage updateBid{OrderType::UPDATE, "VC0", 1, OrderSide::BUY, 308800, 3000, 0};
 
     // Start capturing cout
     std::stringstream buffer;
     std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
 
     book.receiveNewOrder(addBid, 1);
-    book.receiveNewOrder(updateBid, 2);
+    book.receiveNewOrder(addBid2, 2);
+    book.receiveNewOrder(updateBid, 3);
 
     std::cout.rdbuf(oldCout);
     std::string output = buffer.str();
 
-    // assert(output == expected);
-    std::cout << "✅ testUpdateOrder passed\n";
+    assert(output == expected);
+    std::cout << "✅ testUpdateOverlappingOrder passed\n";
 }
 
 // Test Update order
 void testUpdateVolumeAndPrice() {
     OrderBook book("VC0", 3);
 
-    std::string expected = "1, VC0, [(318800, 4709)], []\n2, VC0, [(318800, 3000)], []\n";
+    std::string expected = "1, VC0, [(318800, 1000)], []\n2, VC0, [(318800, 3000)], []\n3, VC0, [(318800, 2000), (310800, 3000)], []\n";
     InputOrderMessage addBid{OrderType::ADD, "VC0", 1, OrderSide::BUY, 318800, 1000, 0};
     InputOrderMessage addBid2{OrderType::ADD, "VC0", 2, OrderSide::BUY, 318800, 2000, 0};
     InputOrderMessage updateBid{OrderType::UPDATE, "VC0", 1, OrderSide::BUY, 310800, 3000, 0};
@@ -89,13 +90,14 @@ void testUpdateVolumeAndPrice() {
     std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
 
     book.receiveNewOrder(addBid, 1);
-    book.receiveNewOrder(updateBid, 2);
+    book.receiveNewOrder(addBid2, 2);
+    book.receiveNewOrder(updateBid, 3);
 
     std::cout.rdbuf(oldCout);
     std::string output = buffer.str();
 
-    // assert(output == expected);
-    std::cout << "✅ testUpdateOrder passed\n";
+    assert(output == expected);
+    std::cout << "✅ testUpdateVolumeAndPrice passed\n";
 }
 
 // Test Execute order
@@ -218,7 +220,7 @@ void testRemoveRelevantLevelOrder()
     std::string output = buffer.str();
 
     assert(output == expected);
-    std::cout << "✅ testCancelOrder_NoSnapshotNeeded passed\n";
+    std::cout << "✅ testRemoveRelevantLevelOrder passed\n";
 }
 
 void testExample1()
